@@ -1,0 +1,75 @@
+/* PRX V4.0.0 · Apple Motion Layer
+   Reine Override-Schicht, wird NACH style.css geladen.
+   Ändert ausschließlich Bewegungs-, Timing- und Oberflächenwerte auf
+   iOS-Standard (UIKit-Sheet-Kurve, Tab-Bar-Maße, Press-Feedback).
+   Keine Layout-Logik, keine Klassenänderungen, keine JS-Abhängigkeit. */
+
+:root{
+  /* UIKit Sheet-/Spring-Kurve und Standarddauern */
+  --ios-spring:cubic-bezier(.32,.72,0,1);
+  --ios-ease:cubic-bezier(.25,.1,.25,1);
+  --ios-dur-sheet:.5s;
+  --ios-dur-card:.42s;
+  --ios-dur-fast:.22s;
+}
+
+/* ---------- Bewegliche Hauptflächen: iOS-Sheet-Kurve ---------- */
+.detail-card{transition:transform var(--ios-dur-sheet) var(--ios-spring),opacity .3s var(--ios-ease)}
+.journal-stage{transition:transform var(--ios-dur-sheet) var(--ios-spring),opacity .32s var(--ios-ease)}
+.jcard{transition:transform var(--ios-dur-card) var(--ios-spring),opacity .25s var(--ios-ease)}
+.poi-row,.poi-info-row{transition:transform .38s var(--ios-spring),opacity .18s var(--ios-ease)}
+.scene-bg{transition:transform .6s var(--ios-spring),opacity .45s var(--ios-ease)}
+
+/* ---------- Grabber exakt wie iOS-Sheets (36 x 5, Radius 2.5) ---------- */
+.detail-grip{width:36px;height:5px;border-radius:2.5px;background:rgba(255,255,255,.30);margin:8px auto 10px}
+.poi-sheet-grip,.poi-focus-grip{width:36px;height:5px;border-radius:2.5px;background:rgba(255,255,255,.30)}
+
+/* ---------- Tab Bar: iOS-Standardmaße und -Material ---------- */
+.bottom-nav{
+  height:calc(49px + 12px + env(safe-area-inset-bottom));
+  padding:6px max(10px,env(safe-area-inset-right)) calc(4px + env(safe-area-inset-bottom)) max(10px,env(safe-area-inset-left));
+  background:rgba(2,26,20,.72);
+  -webkit-backdrop-filter:saturate(180%) blur(22px);
+  backdrop-filter:saturate(180%) blur(22px);
+  border-top:.5px solid rgba(255,255,255,.16);
+  transition:left .35s var(--ios-spring),width .35s var(--ios-spring),border-radius .35s var(--ios-spring),opacity .25s var(--ios-ease);
+}
+.nav{
+  min-height:44px;
+  border-radius:14px;
+  font-size:10px;font-weight:600;letter-spacing:.01em;gap:2px;
+  color:rgba(244,251,248,.55);
+  transition:color .2s var(--ios-ease),transform .2s var(--ios-spring);
+}
+.nav svg{transition:transform .3s var(--ios-spring)}
+/* Aktiver Tab: iOS-Tint statt Pill */
+.nav.active{background:transparent;color:var(--accent)}
+.nav.active svg{transform:translateY(-1px) scale(1.06)}
+.nav:active{transform:scale(.94)}
+
+/* ---------- Press-Feedback für alle Touch-Ziele ---------- */
+.ctl{transition:transform .18s var(--ios-spring),opacity .18s var(--ios-ease)}
+.ctl:active{transform:scale(.92);opacity:.85}
+.route-actions button:active,.link-grid a:active,.menu-row:active,
+.filter-actions button:active,.seg button:active,.day-card:active,
+.poi-row:active,.poi-info-row:active,.region-grid button:active,
+.status-filter-grid button:active{transform:scale(.97);transition:transform .12s var(--ios-ease)}
+
+/* ---------- Sheets gleiten von unten ein (nur Eintritts-Animation,
+              kein Eingriff in die hidden-/display-Logik) ---------- */
+.settings-sheet:not(.hidden),.filter-sheet:not(.hidden){animation:prxSheetIn var(--ios-dur-sheet) var(--ios-spring)}
+@keyframes prxSheetIn{from{transform:translateY(28px);opacity:0}to{transform:translateY(0);opacity:1}}
+
+/* ---------- Toast wie iOS-HUD ---------- */
+.toast:not(.hidden){animation:prxToastIn .35s var(--ios-spring)}
+@keyframes prxToastIn{from{transform:translate(-50%,10px);opacity:0}to{transform:translate(-50%,0);opacity:1}}
+
+/* ---------- Sanftes Momentum-Scrolling in allen Rails/Sheets ---------- */
+.settings-sheet,.filter-sheet,.poi-sheet-rail,.poi-focus-rail,.poi-inline-rail{-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
+
+/* ---------- Barrierefreiheit: reduzierte Bewegung respektieren ---------- */
+@media (prefers-reduced-motion:reduce){
+  .detail-card,.journal-stage,.jcard,.scene-bg,.bottom-nav,.nav,.nav svg,.ctl,
+  .poi-row,.poi-info-row{transition:none!important}
+  .settings-sheet:not(.hidden),.filter-sheet:not(.hidden),.toast:not(.hidden){animation:none!important}
+}
